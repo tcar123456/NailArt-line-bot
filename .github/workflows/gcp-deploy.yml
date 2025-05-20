@@ -39,17 +39,33 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         install_components: 'beta'
 
+    - name: Enable Essential APIs
+      run: |
+        echo "Enabling Cloud Resource Manager API..."
+        gcloud services enable cloudresourcemanager.googleapis.com || true
+        echo "Waiting for API activation to propagate..."
+        sleep 30
+
     - name: Verify Authentication
       run: |
         gcloud auth list
         gcloud config list project
         gcloud projects get-iam-policy $PROJECT_ID
 
-    - name: Enable APIs
+    - name: Enable Required APIs
       run: |
-        for api in artifactregistry.googleapis.com run.googleapis.com containerregistry.googleapis.com; do
+        apis=(
+          "cloudresourcemanager.googleapis.com"
+          "artifactregistry.googleapis.com"
+          "run.googleapis.com"
+          "containerregistry.googleapis.com"
+          "iam.googleapis.com"
+        )
+        
+        for api in "${apis[@]}"; do
           echo "Enabling $api..."
           gcloud services enable $api || echo "Failed to enable $api, continuing..."
+          sleep 5
         done
 
     - name: Authorize Docker push
