@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 環境變數
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# 虛擬環境
+venv/
+ENV/
+
+# 系統檔案
+.DS_Store
+Thumbs.db 
