@@ -28,17 +28,29 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        service_account: '${{ secrets.GCP_SA_EMAIL }}'
+        create_credentials_file: true
+        export_environment_variables: true
+        cleanup_credentials: true
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
+        install_components: 'beta'
+
+    - name: Verify Authentication
+      run: |
+        gcloud auth list
+        gcloud config list project
+        gcloud projects get-iam-policy $PROJECT_ID
 
     - name: Enable APIs
       run: |
-        gcloud services enable artifactregistry.googleapis.com
-        gcloud services enable run.googleapis.com
-        gcloud services enable containerregistry.googleapis.com
+        for api in artifactregistry.googleapis.com run.googleapis.com containerregistry.googleapis.com; do
+          echo "Enabling $api..."
+          gcloud services enable $api || echo "Failed to enable $api, continuing..."
+        done
 
     - name: Authorize Docker push
       run: |
