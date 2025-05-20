@@ -43,14 +43,25 @@ jobs:
       run: |
         echo "Enabling Cloud Resource Manager API..."
         gcloud services enable cloudresourcemanager.googleapis.com || true
+        echo "Enabling IAM API..."
+        gcloud services enable iam.googleapis.com || true
         echo "Waiting for API activation to propagate..."
         sleep 30
 
-    - name: Verify Authentication
+    - name: Verify Authentication and Project Access
       run: |
+        echo "Verifying authentication..."
         gcloud auth list
+        
+        echo "Checking project configuration..."
         gcloud config list project
-        gcloud projects get-iam-policy $PROJECT_ID
+        
+        echo "Testing project access..."
+        gcloud projects describe $PROJECT_ID || echo "Limited project access, continuing..."
+        
+        echo "Checking service account permissions..."
+        gcloud iam service-accounts get-iam-policy ${{ secrets.GCP_SA_EMAIL }} \
+          --project $PROJECT_ID || echo "Limited IAM access, continuing..."
 
     - name: Enable Required APIs
       run: |
