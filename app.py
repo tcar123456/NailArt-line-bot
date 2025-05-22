@@ -28,7 +28,7 @@ def create_rich_menu():
         areas=[
             RichMenuArea(
                 bounds=RichMenuBounds(x=0, y=0, width=833, height=843),
-                action=URIAction(label='馬上預約', uri='https://www.msn.com/zh-tw/news/opinion/%E5%90%8D%E5%AE%B6%E8%AB%96%E5%A3%87-%E9%BB%83%E5%89%B5%E5%A4%8F-%E9%9B%A2%E9%99%B8%E5%A3%AF%E9%81%8A%E7%9A%84%E5%8F%B0%E7%81%A3%E6%96%B0%E8%88%AA%E7%A8%8B/ar-AA1FeMhg?ocid=msedgntp&pc=U531&cvid=ff9bc3e76ee24316b30e4fb18a71d9fd&ei=12')
+                action=URIAction(label='馬上預約', uri='https://www.gamer.com.tw/')
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=833, y=0, width=833, height=843),
