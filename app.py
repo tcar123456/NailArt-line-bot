@@ -85,7 +85,7 @@ def handle_message(event):
     # 當收到文字訊息時，回覆「你好！」
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text='你好！')
+        [TextSendMessage(text='你好！')]
     )
 
 if __name__ == "__main__":
