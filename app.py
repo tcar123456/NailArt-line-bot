@@ -4,7 +4,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
     RichMenu, RichMenuArea, RichMenuBounds,
-    RichMenuSize, PostbackAction, URIAction
+    RichMenuSize, PostbackAction, MessageAction,
+    ImagemapSendMessage, BaseSize, MessageImagemapAction, URIImagemapAction, ImagemapArea
 )
 import os
 from dotenv import load_dotenv
@@ -28,7 +29,7 @@ def create_rich_menu():
         areas=[
             RichMenuArea(
                 bounds=RichMenuBounds(x=0, y=0, width=833, height=843),
-                action=URIAction(label='馬上預約', uri='https://www.gamer.com.tw/')
+                action=MessageAction(label='馬上預約', text='馬上預約')
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=833, y=0, width=833, height=843),
@@ -80,9 +81,28 @@ def callback():
 
     return 'OK'
 
+# 處理收到「馬上預約」文字訊息的事件
+@handler.add(MessageEvent, message=TextMessage, text='馬上預約')
+def handle_book_message(event):
+    # 在這裡定義您的圖文訊息內容
+    # 圖片的 URL 需要是公開可訪問的
+    imagemap_message = ImagemapSendMessage(
+        base_url='https://storage.cloud.google.com/your-project-id-line-bot-images/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A8%AD%E8%A8%88.png', # 替換成您圖文訊息圖片的基礎 URL
+        alt_text='預約服務',
+        base_size=BaseSize(width=1040, height=1040), # 替換成您圖片的實際尺寸
+        actions=[
+            URIImagemapAction(
+                area=ImagemapArea(x=0, y=0, width=1040, height=1040), # 定義整個圖片區域可點擊
+                link_uri='https://www.gamer.com.tw/' # 替換成您想要連結到的網址
+            )
+        ]
+    )
+    line_bot_api.reply_message(event.reply_token, [imagemap_message])
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # 當收到文字訊息時，回覆「你好！」
+    # 當收到文字訊息時，回覆「你好！」 (如果不是「馬上預約」)
+    # 這個處理器會處理所有 TextMessage，但「馬上預約」會被上面的處理器優先處理
     line_bot_api.reply_message(
         event.reply_token,
         [TextSendMessage(text='你好！')]
