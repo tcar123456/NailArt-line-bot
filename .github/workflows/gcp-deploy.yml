@@ -23,6 +23,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Create Rich Menu Image
+      run: python create_rich_menu_image.py
+
     - name: Google Auth
       id: auth
       uses: google-github-actions/auth@v1
