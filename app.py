@@ -21,6 +21,19 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
 
+def delete_all_rich_menu():
+    """刪除所有 Rich Menu"""
+    try:
+        # 獲取所有 Rich Menu 列表
+        rich_menu_list = line_bot_api.get_rich_menu_list()
+        # 刪除每個 Rich Menu
+        for rich_menu in rich_menu_list:
+            line_bot_api.delete_rich_menu(rich_menu.rich_menu_id)
+            logger.info(f"已刪除 Rich Menu: {rich_menu.rich_menu_id}")
+        logger.info("所有 Rich Menu 已刪除")
+    except Exception as e:
+        logger.error(f"刪除 Rich Menu 時發生錯誤: {str(e)}")
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # 獲取 X-Line-Signature header 值
@@ -62,5 +75,7 @@ def handle_message(event):
         logger.error(f"回覆訊息時發生錯誤: {str(e)}")
 
 if __name__ == "__main__":
+    # 刪除所有 Rich Menu
+    delete_all_rich_menu()
     # 啟動應用程式
     app.run(debug=True) 
