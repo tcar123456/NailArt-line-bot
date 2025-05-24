@@ -1,14 +1,25 @@
-# LINE Bot 範例
+# LINE Bot 美甲預約服務
 
-這是一個簡單的 LINE Bot 範例，當收到訊息時會回覆「你好！」。
+這是一個 LINE Bot 美甲預約服務，包含主要服務程式和快捷選單設定工具。
 
-## 環境需求
+## 系統需求
 
-- Python 3.7 或更高版本
+- Python 3.9 或更高版本
 - pip（Python 套件管理器）
 - Git
+- LINE Messaging API 帳號
 - Google Cloud Platform 帳號
-- Docker（選用，用於本地測試）
+
+## 專案結構
+
+```
+├── app.py                 # 主要的 LINE Bot 服務程式
+├── create_rich_menu.py    # 快捷選單設定工具（本地執行）
+├── rich_menu_image.png    # 快捷選單圖片
+├── requirements.txt       # Python 套件依賴
+├── Dockerfile            # Docker 設定檔
+└── .env                  # 環境變數設定（需自行建立）
+```
 
 ## 安裝步驟
 
@@ -18,114 +29,77 @@ git clone [你的GitHub倉庫URL]
 cd [專案資料夾名稱]
 ```
 
-2. 安裝所需套件：
+2. 建立虛擬環境：
+```bash
+# 建立虛擬環境
+python -m venv venv
+
+# 啟動虛擬環境
+# Windows:
+.\venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+```
+
+3. 安裝依賴套件：
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 設定環境變數：
-   - 建立 `.env` 檔案
-   - 填入以下內容：
-   ```
-   LINE_CHANNEL_ACCESS_TOKEN=你的頻道存取權杖
-   LINE_CHANNEL_SECRET=你的頻道密鑰
-   ```
+4. 設定環境變數：
+建立 `.env` 檔案並填入：
+```
+LINE_CHANNEL_ACCESS_TOKEN=你的頻道存取權杖
+LINE_CHANNEL_SECRET=你的頻道密鑰
+```
 
-4. 準備快捷選單圖片：
-   - 建立一個 2500x1686 像素的 Rich Menu 圖片檔案
-   - 將檔案命名為 `rich_menu_image.png` 並放在專案根目錄下
-   - 圖片內容應對應程式碼中定義的按鈕區域
+## 使用方式
 
-5. 在 LINE Developers 後台設定：
-   - Webhook URL：https://你的網域/callback
+### 設定快捷選單（本地執行）
+
+1. 確保 `rich_menu_image.png` 檔案存在且尺寸為 2500x1686 像素
+2. 執行快捷選單設定工具：
+```bash
+python create_rich_menu.py
+```
+
+### 部署主要服務
+
+1. 提交程式碼到 GitHub：
+```bash
+git add .
+git commit -m "更新程式碼"
+git push
+```
+
+2. GitHub Actions 會自動部署到 Google Cloud Run
+
+### LINE Developers 設定
+
+1. 在 LINE Developers Console 中：
+   - 設定 Webhook URL 為 Cloud Run 服務的 URL + "/callback"
    - 開啟 Use webhook
    - 關閉自動回覆訊息
 
-## 執行方式
+## 開發說明
 
-本地執行：
-```bash
-python app.py
-```
+- `app.py`：主要的 LINE Bot 服務，會部署到 Cloud Run
+- `create_rich_menu.py`：快捷選單設定工具，只在本地執行
+- 更新快捷選單時只需在本地執行 `create_rich_menu.py`
+- 更新主要服務時，提交到 GitHub 後會自動部署
 
-使用 Docker 執行：
-```bash
-docker build -t line-bot .
-docker run -p 8080:8080 line-bot
-```
+## 注意事項
 
-## 部署到 GitHub
+- 請勿將 `.env` 檔案提交到 Git
+- 快捷選單圖片必須符合 LINE 的規格要求
+- 本地測試時需要使用 ngrok 等工具建立 HTTPS 連線
 
-1. 初始化 Git 倉庫：
-```bash
-git init
-```
+## 環境變數設定
 
-2. 添加檔案到暫存區：
-```bash
-git add .
-```
+在 Google Cloud Run 中需設定：
+- LINE_CHANNEL_ACCESS_TOKEN
+- LINE_CHANNEL_SECRET
 
-3. 提交變更：
-```bash
-git commit -m "初始化 LINE Bot 專案"
-```
+## 授權
 
-4. 添加遠端倉庫：
-```bash
-git remote add origin [你的GitHub倉庫URL]
-```
-
-5. 推送到 GitHub：
-```bash
-git push -u origin main
-```
-
-## 部署到 Google Cloud Platform
-
-### 前置準備
-
-1. 建立 GCP 專案並啟用必要的 API：
-   - Cloud Run API
-   - Artifact Registry API
-   - Cloud Build API
-   - Cloud Resource Manager API
-   - Identity and Access Management (IAM) API
-
-2. 建立服務帳號（Service Account）：
-   - 前往 GCP Console > IAM & Admin > Service Accounts
-   - 建立新的服務帳號
-   - 賦予必要權限：
-     - Service Usage Admin
-     - Service Usage Consumer
-     - Service Management Administrator
-     - Project IAM Admin
-     - Cloud Run Admin
-     - Storage Admin
-     - Artifact Registry Administrator
-     - Security Reviewer
-
-3. 下載服務帳號金鑰（JSON 格式）
-
-### 設定 GitHub Secrets
-
-在 GitHub 倉庫設定中添加以下 Secrets：
-- `GCP_PROJECT_ID`：你的 GCP 專案 ID
-- `GCP_SA_KEY`：服務帳號金鑰的 JSON 內容
-- `GCP_SA_EMAIL`：服務帳號電子郵件地址
-- `LINE_CHANNEL_ACCESS_TOKEN`：LINE Channel Access Token
-- `LINE_CHANNEL_SECRET`：LINE Channel Secret
-
-### 自動部署
-
-- 推送到 main 分支時會自動觸發部署
-- 部署進度可在 GitHub Actions 頁面查看
-- 部署完成後，在 Cloud Run 控制台獲取服務 URL
-- 將 Cloud Run 服務 URL 更新到 LINE Developers 的 Webhook URL
-
-注意事項：
-- 請確保 `.env` 檔案已加入 `.gitignore`
-- 不要將敏感資訊上傳到 GitHub
-- 本地開發時需要使用 ngrok 等工具來建立 HTTPS 連線
-- 確保 GCP 專案已啟用帳單功能
-- 確保 `rich_menu_image.png` 檔案存在於專案根目錄下 
+[授權說明] 

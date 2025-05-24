@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -20,17 +19,27 @@ var/
 .installed.cfg
 *.egg
 
+# 虛擬環境
+venv/
+env/
+ENV/
+
 # 環境變數
 .env
+.env.*
 
 # IDE
 .vscode/
 .idea/
-
-# 虛擬環境
-venv/
-ENV/
+*.swp
+*.swo
 
 # 系統檔案
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# 日誌檔案
+*.log
+
+# 本地開發用檔案
+local_settings.py 
