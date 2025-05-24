@@ -83,20 +83,21 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_message = event.message.text
-    if user_message == '馬上預約':
+    # 處理文字訊息
+    if event.message.text == '馬上預約':
         line_bot_api.reply_message(
             event.reply_token,
-            [TextSendMessage(text='感謝您的預約！我們會盡快與您聯繫。')]
+            [TextSendMessage(text='您已點擊馬上預約，我們將為您安排預約服務！')]
         )
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            [TextSendMessage(text='您好！請問有什麼可以協助您的嗎？')]
+            [TextSendMessage(text='您好！請問有什麼可以為您服務的嗎？')]
         )
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
+    # 處理 Postback 事件（圖片區域點擊）
     data = event.postback.data
     if data == 'action=B':
         line_bot_api.reply_message(
@@ -108,7 +109,7 @@ def handle_postback(event):
             event.reply_token,
             [TextSendMessage(text='您點擊了區域 C')]
         )
-    # 可以根據需要添加其他區域的處理邏輯
+    # ... 可以根據需要添加其他區域的處理邏輯 ...
 
 if __name__ == "__main__":
     # 建立 Rich Menu
