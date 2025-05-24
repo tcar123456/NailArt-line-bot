@@ -1,9 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage
-)
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
 from dotenv import load_dotenv
 import logging
@@ -20,19 +18,6 @@ app = Flask(__name__)
 # LINE Bot 設定
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
-
-def delete_all_rich_menu():
-    """刪除所有 Rich Menu"""
-    try:
-        # 獲取所有 Rich Menu 列表
-        rich_menu_list = line_bot_api.get_rich_menu_list()
-        # 刪除每個 Rich Menu
-        for rich_menu in rich_menu_list:
-            line_bot_api.delete_rich_menu(rich_menu.rich_menu_id)
-            logger.info(f"已刪除 Rich Menu: {rich_menu.rich_menu_id}")
-        logger.info("所有 Rich Menu 已刪除")
-    except Exception as e:
-        logger.error(f"刪除 Rich Menu 時發生錯誤: {str(e)}")
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -58,24 +43,20 @@ def handle_message(event):
     message_text = event.message.text
     logger.info(f"收到訊息: {message_text}")
     
-    # 當收到「馬上預約」時回覆 OK
+    # 只處理「馬上預約」訊息
     if message_text == '馬上預約':
         reply_text = 'OK'
-    else:
-        reply_text = '您好！請問有什麼我可以幫您的嗎？'
-    
-    # 發送回覆
-    try:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=reply_text)
-        )
-        logger.info(f"已回覆訊息: {reply_text}")
-    except Exception as e:
-        logger.error(f"回覆訊息時發生錯誤: {str(e)}")
+        
+        # 發送回覆
+        try:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=reply_text)
+            )
+            logger.info(f"已回覆訊息: {reply_text}")
+        except Exception as e:
+            logger.error(f"回覆訊息時發生錯誤: {str(e)}")
 
 if __name__ == "__main__":
-    # 刪除所有 Rich Menu
-    delete_all_rich_menu()
     # 啟動應用程式
     app.run(debug=True) 
