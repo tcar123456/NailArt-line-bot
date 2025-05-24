@@ -48,10 +48,10 @@ pip install -r requirements.txt
 
 4. 設定環境變數：
 建立 `.env` 檔案並填入：
-```
-LINE_CHANNEL_ACCESS_TOKEN=你的頻道存取權杖
-LINE_CHANNEL_SECRET=你的頻道密鑰
-```
+   ```
+   LINE_CHANNEL_ACCESS_TOKEN=你的頻道存取權杖
+   LINE_CHANNEL_SECRET=你的頻道密鑰
+   ```
 
 ## 使用方式
 

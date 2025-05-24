@@ -1,7 +1,7 @@
 from linebot import LineBotApi
 from linebot.models import (
     RichMenu, RichMenuArea, RichMenuBounds,
-    RichMenuSize, MessageAction
+    RichMenuSize, MessageAction, URIAction
 )
 import os
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ def create_rich_menu():
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=0, y=843, width=833, height=843),
-                action=MessageAction(label='作品集', text='作品集')
+                action=URIAction(label='作品集', uri='https://www.instagram.com/weii_nail')
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=833, y=843, width=833, height=843),

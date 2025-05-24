@@ -2,6 +2,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from message_templates import get_booking_template
 import os
 from dotenv import load_dotenv
 import logging
@@ -45,17 +46,14 @@ def handle_message(event):
     
     # 處理訊息
     if message_text == '馬上預約':
-        reply_text = 'OK'
-        
-        # 發送回覆
         try:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=reply_text)
+                get_booking_template()
             )
-            logger.info(f"已回覆訊息: {reply_text}")
+            logger.info("已發送預約按鈕模板訊息")
         except Exception as e:
-            logger.error(f"回覆訊息時發生錯誤: {str(e)}")
+            logger.error(f"發送預約按鈕模板訊息時發生錯誤: {str(e)}")
 
 if __name__ == "__main__":
     # 啟動應用程式
