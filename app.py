@@ -4,7 +4,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
     RichMenu, RichMenuArea, RichMenuBounds,
-    RichMenuSize, PostbackAction, MessageAction
+    RichMenuSize, PostbackAction, MessageAction,
+    PostbackEvent
 )
 import os
 from dotenv import load_dotenv
@@ -82,11 +83,32 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # 當收到文字訊息時，回覆「你好！」
-    line_bot_api.reply_message(
-        event.reply_token,
-        [TextSendMessage(text='你好！')]
-    )
+    user_message = event.message.text
+    if user_message == '馬上預約':
+        line_bot_api.reply_message(
+            event.reply_token,
+            [TextSendMessage(text='感謝您的預約！我們會盡快與您聯繫。')]
+        )
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            [TextSendMessage(text='您好！請問有什麼可以協助您的嗎？')]
+        )
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    data = event.postback.data
+    if data == 'action=B':
+        line_bot_api.reply_message(
+            event.reply_token,
+            [TextSendMessage(text='您點擊了區域 B')]
+        )
+    elif data == 'action=C':
+        line_bot_api.reply_message(
+            event.reply_token,
+            [TextSendMessage(text='您點擊了區域 C')]
+        )
+    # 可以根據需要添加其他區域的處理邏輯
 
 if __name__ == "__main__":
     # 建立 Rich Menu
