@@ -8,6 +8,11 @@ from linebot.models import (
 )
 import os
 from dotenv import load_dotenv
+import logging
+
+# 設定日誌
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # 載入環境變數
 load_dotenv()
@@ -71,24 +76,46 @@ def callback():
 
     # 獲取請求內容
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    logger.info("收到 webhook 請求")
+    logger.info(f"Request body: {body}")
 
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
+        logger.error("無效的簽名")
         abort(400)
 
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # 當收到文字訊息時，回覆「你好！」
-    line_bot_api.reply_message(
-        event.reply_token,
-        [TextSendMessage(text='你好！')]
-    )
+    # 記錄收到的訊息
+    message_text = event.message.text
+    logger.info(f"收到訊息: {message_text}")
+    
+    # 根據不同的訊息內容做出不同的回覆
+    if message_text == '馬上預約':
+        reply_text = '好的，我們來安排預約時間。請問您想要預約哪一天呢？'
+    else:
+        reply_text = '您好！請問有什麼我可以幫您的嗎？'
+    
+    # 發送回覆
+    try:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_text)
+        )
+        logger.info(f"已回覆訊息: {reply_text}")
+    except Exception as e:
+        logger.error(f"回覆訊息時發生錯誤: {str(e)}")
 
 if __name__ == "__main__":
     # 建立 Rich Menu
-    create_rich_menu()
-    app.run() 
+    try:
+        rich_menu_id = create_rich_menu()
+        logger.info(f"成功建立 Rich Menu，ID: {rich_menu_id}")
+    except Exception as e:
+        logger.error(f"建立 Rich Menu 時發生錯誤: {str(e)}")
+    
+    # 啟動應用程式
+    app.run(debug=True) 
