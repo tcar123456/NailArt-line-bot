@@ -8,7 +8,7 @@ def get_booking_template():
     return TemplateSendMessage(
         alt_text='預約資訊',
         template=ButtonsTemplate(
-            thumbnail_image_url='https://storage.cloud.google.com/your-project-id-line-bot-images/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A8%AD%E8%A8%88.png',  # 請替換為你的美甲店照片URL
+            thumbnail_image_url='https://res.cloudinary.com/div4nzzda/image/upload/v1748183723/message_templates1_jqpdsw.png',  # 請替換為你的美甲店照片URL
             title=None,
             text=' ',  # LINE Bot 要求必須要有 text，但可以是空白
             actions=[
