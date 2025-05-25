@@ -28,7 +28,6 @@ def callback():
     # 獲取請求內容
     body = request.get_data(as_text=True)
     logger.info("收到 webhook 請求")
-    logger.info(f"Request body: {body}")
 
     try:
         handler.handle(body, signature)
@@ -51,9 +50,9 @@ def handle_message(event):
                 event.reply_token,
                 get_booking_template()
             )
-            logger.info("已發送預約按鈕模板訊息")
+            logger.info("已發送預約模板訊息")
         except Exception as e:
-            logger.error(f"發送預約按鈕模板訊息時發生錯誤: {str(e)}")
+            logger.error(f"發送訊息時發生錯誤: {str(e)}")
 
 if __name__ == "__main__":
     # 啟動應用程式

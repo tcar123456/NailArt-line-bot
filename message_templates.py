@@ -1,21 +1,21 @@
 from linebot.models import (
-    TemplateSendMessage,
-    ButtonsTemplate,
-    URIAction,
+    ImagemapSendMessage,
+    ImagemapArea,
+    URIImagemapAction,
+    BaseSize
 )
 
 def get_booking_template():
-    return TemplateSendMessage(
+    return ImagemapSendMessage(
+        base_url='https://res.cloudinary.com/div4nzzda/image/upload/w_1040,h_1040,c_fill/v1748184390/message_templates2_ugvpah',
         alt_text='預約資訊',
-        template=ButtonsTemplate(
-            thumbnail_image_url='https://res.cloudinary.com/div4nzzda/image/upload/v1748183723/message_templates1_jqpdsw.png',  # 請替換為你的美甲店照片URL
-            title=None,
-            text=' ',  # LINE Bot 要求必須要有 text，但可以是空白
-            actions=[
-                URIAction(
-                    label='開始預約',
-                    uri='https://jp-tutor.pages.dev/date'  # 請替換為你的預約網站網址
+        base_size=BaseSize(height=1040, width=1040),
+        actions=[
+            URIImagemapAction(
+                link_uri='https://jp-tutor.pages.dev/date',
+                area=ImagemapArea(
+                    x=0, y=832, width=1040, height=208
                 )
-            ]
-        )
+            )
+        ]
     ) 
