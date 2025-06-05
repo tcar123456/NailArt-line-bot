@@ -15,6 +15,13 @@ def get_booking_template():
     cloud_name = "div4nzzda"
     public_id = "message_templates2"
     
+    # LIFF 設定說明：
+    # 1. 需要建立一個新的 "LINE Login" Channel（不是 Messaging API Channel）
+    # 2. 在 LINE Login Channel 的 LIFF 分頁中建立 LIFF 應用程式
+    # 3. 取得 LIFF URL 並替換下面的網址
+    # 格式：https://liff.line.me/xxxxxxxxx-xxxxxxxx
+    liff_url = "https://liff.line.me/2007532770-0bqJlAgm"  # 請替換為實際的 LIFF URL
+    
     return FlexSendMessage(
         alt_text='美甲預約',
         contents=BubbleContainer(
@@ -30,14 +37,14 @@ def get_booking_template():
                 layout='vertical',
                 spacing='none',  # 移除按鈕間距
                 contents=[
-                    # 主要預約按鈕
+                    # 主要預約按鈕（使用 LIFF，在 LINE 內開啟）
                     ButtonComponent(
                         style='primary',
                         height='sm',
                         color='#FF69B4',  # 自訂按鈕顏色
                         action=URIAction(
                             label='🗓️ 立即預約',
-                            uri='https://jp-tutor.pages.dev/date'
+                            uri=liff_url  # 使用 LIFF URL
                         )
                     ),
                     # 作品集按鈕
