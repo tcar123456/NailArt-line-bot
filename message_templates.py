@@ -7,22 +7,31 @@ from linebot.models import (
 )
 
 def get_booking_template():
-    # 解決版本號碼不同的問題：
-    # 1. 找出兩張圖片中較新的版本號碼
-    # 2. 在 base_url 中指定該版本號碼
-    # 3. 確保兩張圖片都能用相同版本號碼存取
+    # 使用 Cloudinary 動態轉檔：
+    # 1. 只需要上傳一張原始圖片到 Cloudinary
+    # 2. 透過 URL 參數動態產生不同尺寸
+    # 3. LINE 會自動在 base_url 後加上 "-1040" 和 "-700"
+    # 4. 我們在 base_url 中加入轉檔參數，讓 Cloudinary 動態產生對應尺寸
     
-    # 請檢查您的兩張圖片的版本號碼，使用較新的那個
-    # 例如：如果 message_templates2-1040 是 v1749104975
-    #      如果 message_templates2-700 是 v1749105123
-    #      則使用 v1749105123
+    # 你的 Cloudinary 設定
+    cloud_name = "div4nzzda"
+    public_id = "message_templates2"  # 原始圖片的 Public ID（不含尺寸後綴）
+    
+    # 使用動態轉檔的 base_url
+    # c_fill 會填滿指定尺寸，q_auto 自動優化品質
+    base_url = f'https://res.cloudinary.com/{cloud_name}/image/upload/c_fill,q_auto/w_{{width}},h_{{height}}/{public_id}'
+    
+    # 替換 {width} 和 {height} 為實際數值
+    # LINE 會在此 URL 後加上 "-1040" 和 "-700"，所以我們需要特殊處理
     
     width = 1040
     height = 1040
 
     return ImagemapSendMessage(
-        # 請將 v1749105123 替換為您實際的較新版本號碼
-        base_url='https://res.cloudinary.com/div4nzzda/image/upload/v1749109784/message_templates2',
+        # 使用不含轉檔參數的 base_url，讓 LINE 自動加上 -1040/-700 後綴
+        # 然後透過 preview_image_url 指定預覽圖的動態轉檔 URL
+        base_url=f'https://res.cloudinary.com/{cloud_name}/image/upload/c_fill,q_auto,w_1040,h_1040/{public_id}',
+        preview_image_url=f'https://res.cloudinary.com/{cloud_name}/image/upload/c_fill,q_auto,w_700,h_700/{public_id}',
         alt_text='預約資訊',
         base_size=BaseSize(height=height, width=width),
         actions=[
