@@ -3,20 +3,22 @@ from linebot.models import (
     ImagemapArea,
     URIImagemapAction,
     BaseSize,
-    MessageImagemapAction
+    MessageImagemapAction,
+    ButtonsTemplate,
+    TemplateSendMessage,
+    URIAction
 )
 
 def get_booking_template():
     # 取消動態轉檔，使用 preview_image_url 讓兩個 URL 都指向同一張圖片
     # 這樣可以避免 LINE 自動加上 "-1040" 和 "-700" 後綴造成的問題
     
-    # Google Drive 圖片設定
-    # 原始分享連結：https://drive.google.com/file/d/10eYCtkWj8PteawTM38wPzazExMM4OyhP/view?usp=drive_link
-    # 轉換為直接下載連結：
-    file_id = "10eYCtkWj8PteawTM38wPzazExMM4OyhP"
-    image_url = f'https://drive.google.com/uc?export=download&id={file_id}'
+    # 改回 Cloudinary 設定
+    cloud_name = "div4nzzda"
+    public_id = "message_templates2"
     
-    # 注意：Google Drive 圖片必須設定為「知道連結的任何人都可以檢視」
+    # 使用 Cloudinary URL
+    image_url = f'https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}'
     
     width = 1040
     height = 1040
@@ -38,5 +40,25 @@ def get_booking_template():
                 )
             )
         ]
+    )
+
+# ButtonsTemplate 測試版本
+def get_booking_template_buttons():
+    cloud_name = "div4nzzda"
+    public_id = "message_templates2"
+    
+    return TemplateSendMessage(
+        alt_text='預約資訊',
+        template=ButtonsTemplate(
+            thumbnail_image_url=f'https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}',
+            title='美甲預約',
+            text='點擊下方按鈕進行預約',
+            actions=[
+                URIAction(
+                    label='馬上預約',
+                    uri='https://jp-tutor.pages.dev/date'
+                )
+            ]
+        )
     )
 

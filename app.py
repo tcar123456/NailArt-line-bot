@@ -3,7 +3,7 @@ from flask import Flask, request, abort  # Flask 網頁框架，用於建立 web
 from linebot import LineBotApi, WebhookHandler  # LINE Bot SDK 的核心類別
 from linebot.exceptions import InvalidSignatureError  # LINE Bot 簽名驗證錯誤例外
 from linebot.models import MessageEvent, TextMessage, TextSendMessage  # LINE Bot 訊息相關類別
-from message_templates import get_booking_template  # 匯入自訂的訊息模板函數
+from message_templates import get_booking_template, get_booking_template_buttons  # 匯入自訂的訊息模板函數
 import os  # 作業系統相關功能，用於讀取環境變數
 from dotenv import load_dotenv  # 載入 .env 檔案中的環境變數
 import logging  # 日誌記錄功能
@@ -55,15 +55,26 @@ def handle_message(event):
     # 判斷用戶發送的訊息內容，並做出相應回應
     if message_text == '馬上預約':
         try:
-            # 回覆預約相關的圖文訊息模板
+            # 回覆預約相關的圖文訊息模板（ImagemapSendMessage）
             line_bot_api.reply_message(
                 event.reply_token,  # 回覆權杖，用於回覆特定訊息
                 get_booking_template()  # 呼叫預約模板函數
             )
-            logger.info("已發送預約模板訊息")  # 記錄成功發送訊息的日誌
+            logger.info("已發送預約模板訊息（Imagemap）")  # 記錄成功發送訊息的日誌
         except Exception as e:
             # 如果發送訊息時發生錯誤，記錄錯誤資訊
-            logger.error(f"發送訊息時發生錯誤: {str(e)}")
+            logger.error(f"發送 Imagemap 訊息時發生錯誤: {str(e)}")
+    
+    elif message_text == '測試按鈕':
+        try:
+            # 回覆預約相關的按鈕模板（ButtonsTemplate）
+            line_bot_api.reply_message(
+                event.reply_token,
+                get_booking_template_buttons()
+            )
+            logger.info("已發送預約模板訊息（Buttons）")
+        except Exception as e:
+            logger.error(f"發送 Buttons 訊息時發生錯誤: {str(e)}")
 
 # 程式進入點，當直接執行此檔案時會啟動 Flask 伺服器
 if __name__ == "__main__":
