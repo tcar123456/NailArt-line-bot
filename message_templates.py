@@ -10,12 +10,13 @@ def get_booking_template():
     # 取消動態轉檔，使用 preview_image_url 讓兩個 URL 都指向同一張圖片
     # 這樣可以避免 LINE 自動加上 "-1040" 和 "-700" 後綴造成的問題
     
-    # 你的 Cloudinary 設定
-    cloud_name = "div4nzzda"
-    public_id = "message_templates2"
+    # Google Drive 圖片設定
+    # 原始分享連結：https://drive.google.com/file/d/10eYCtkWj8PteawTM38wPzazExMM4OyhP/view?usp=drive_link
+    # 轉換為直接下載連結：
+    file_id = "10eYCtkWj8PteawTM38wPzazExMM4OyhP"
+    image_url = f'https://drive.google.com/uc?export=download&id={file_id}'
     
-    # 使用同一張 1040x1040 的圖片 URL
-    image_url = f'https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}'
+    # 注意：Google Drive 圖片必須設定為「知道連結的任何人都可以檢視」
     
     width = 1040
     height = 1040
