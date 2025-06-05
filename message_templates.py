@@ -23,7 +23,7 @@ def get_booking_template():
     
     return ImagemapSendMessage(
         # base_url 不應包含檔案格式或尺寸參數
-        base_url='https://res.cloudinary.com/div4nzzda/image/upload/v1748184390/message_templates2',
+        base_url='https://res.cloudinary.com/div4nzzda/image/upload/message_templates2',
         alt_text='預約資訊',
         base_size=BaseSize(height=height, width=width),
         actions=[
