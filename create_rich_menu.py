@@ -46,7 +46,7 @@ def create_rich_menu():
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=833, y=843, width=833, height=843),
-                action=MessageAction(label='店家資訊', text='店家資訊')
+                action=URIAction(label='預約管理', uri='https://6c0d01e2.nail-art-line-bot-wei.pages.dev/booking-management')
             ),
             RichMenuArea(
                 bounds=RichMenuBounds(x=1666, y=843, width=834, height=843),
