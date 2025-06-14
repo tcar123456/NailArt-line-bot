@@ -31,7 +31,7 @@ def create_rich_menu():
             # 右上（上半部）：立即預約
             RichMenuArea(
                 bounds=RichMenuBounds(x=1250, y=0, width=1250, height=421),
-                action=MessageAction(label='立即預約', text='馬上預約')
+                action=URIAction(label='預約管理', uri='https://liff.line.me/2007532770-0bqJlAgm')
             ),
             # 右上（下半部）：預約查詢
             RichMenuArea(

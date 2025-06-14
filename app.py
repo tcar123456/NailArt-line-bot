@@ -53,19 +53,19 @@ def handle_message(event):
     logger.info(f"收到訊息: {message_text}")  # 記錄收到的訊息內容
     
     # 判斷用戶發送的訊息內容，並做出相應回應
-    if message_text == '馬上預約':
-        try:
-            # 主要功能：使用 Flex Message 回覆預約訊息
-            line_bot_api.reply_message(
-                event.reply_token,  # 回覆權杖，用於回覆特定訊息
-                get_booking_template()  # 使用 Flex Message
-            )
-            logger.info("已發送預約模板訊息（Flex Message）")  # 記錄成功發送訊息的日誌
-        except Exception as e:
+    #if message_text == '馬上預約':
+    #    try:
+    #         主要功能：使用 Flex Message 回覆預約訊息
+    #        line_bot_api.reply_message(
+    #            event.reply_token,  # 回覆權杖，用於回覆特定訊息
+    #            get_booking_template()  # 使用 Flex Message
+    #        )
+    #        logger.info("已發送預約模板訊息（Flex Message）")  # 記錄成功發送訊息的日誌
+    #    except Exception as e:
             # 如果發送訊息時發生錯誤，記錄錯誤資訊
-            logger.error(f"發送 Flex Message 訊息時發生錯誤: {str(e)}")
+    #        logger.error(f"發送 Flex Message 訊息時發生錯誤: {str(e)}")
     
-    elif message_text == '價目表':
+    if message_text == '價目表':
         try:
             # 回傳價目表圖片
             line_bot_api.reply_message(
