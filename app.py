@@ -79,6 +79,27 @@ def handle_message(event):
         except Exception as e:
             # 如果發送圖片時發生錯誤，記錄錯誤資訊
             logger.error(f"發送價目表圖片時發生錯誤: {str(e)}")
+    
+    elif message_text == '預約須知':
+        try:
+            # 回傳兩張預約須知圖片
+            line_bot_api.reply_message(
+                event.reply_token,
+                [
+                    ImageSendMessage(
+                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0002_rleygj.png",
+                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0002_rleygj.png"
+                    ),
+                    ImageSendMessage(
+                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0003_amx87y.png",
+                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0003_amx87y.png"
+                    )
+                ]
+            )
+            logger.info("已發送預約須知圖片")  # 記錄成功發送圖片的日誌
+        except Exception as e:
+            # 如果發送圖片時發生錯誤，記錄錯誤資訊
+            logger.error(f"發送預約須知圖片時發生錯誤: {str(e)}")
 
 # 程式進入點，當直接執行此檔案時會啟動 Flask 伺服器
 if __name__ == "__main__":
