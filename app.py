@@ -2,7 +2,7 @@
 from flask import Flask, request, abort  # Flask 網頁框架，用於建立 webhook 伺服器
 from linebot import LineBotApi, WebhookHandler  # LINE Bot SDK 的核心類別
 from linebot.exceptions import InvalidSignatureError  # LINE Bot 簽名驗證錯誤例外
-from linebot.models import MessageEvent, TextMessage, TextSendMessage  # LINE Bot 訊息相關類別
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage  # LINE Bot 訊息相關類別
 from message_templates import get_booking_template  # 匯入自訂的訊息模板函數
 import os  # 作業系統相關功能，用於讀取環境變數
 from dotenv import load_dotenv  # 載入 .env 檔案中的環境變數
@@ -64,6 +64,21 @@ def handle_message(event):
         except Exception as e:
             # 如果發送訊息時發生錯誤，記錄錯誤資訊
             logger.error(f"發送 Flex Message 訊息時發生錯誤: {str(e)}")
+    
+    elif message_text == '價目表':
+        try:
+            # 回傳價目表圖片
+            line_bot_api.reply_message(
+                event.reply_token,
+                ImageSendMessage(
+                    original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912191/WEII_nail_20250614_202005_0000_nstev5.png",
+                    preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912191/WEII_nail_20250614_202005_0000_nstev5.png"
+                )
+            )
+            logger.info("已發送價目表圖片")  # 記錄成功發送圖片的日誌
+        except Exception as e:
+            # 如果發送圖片時發生錯誤，記錄錯誤資訊
+            logger.error(f"發送價目表圖片時發生錯誤: {str(e)}")
 
 # 程式進入點，當直接執行此檔案時會啟動 Flask 伺服器
 if __name__ == "__main__":

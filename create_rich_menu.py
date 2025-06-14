@@ -28,30 +28,31 @@ def create_rich_menu():
         name="Nail Art Menu",
         chat_bar_text="點擊開啟選單",
         areas=[
+            # 右上（上半部）：立即預約
             RichMenuArea(
-                bounds=RichMenuBounds(x=0, y=0, width=833, height=843),
-                action=MessageAction(label='馬上預約', text='馬上預約')
+                bounds=RichMenuBounds(x=1250, y=0, width=1250, height=421),
+                action=MessageAction(label='立即預約', text='馬上預約')
             ),
+            # 右上（下半部）：預約查詢
             RichMenuArea(
-                bounds=RichMenuBounds(x=833, y=0, width=833, height=843),
-                action=MessageAction(label='服務項目', text='服務項目')
-            ),
-            RichMenuArea(
-                bounds=RichMenuBounds(x=1666, y=0, width=834, height=843),
-                action=MessageAction(label='價目表', text='價目表')
-            ),
-            RichMenuArea(
-                bounds=RichMenuBounds(x=0, y=843, width=833, height=843),
-                action=URIAction(label='作品集', uri='https://www.instagram.com/weii_nail')
-            ),
-            RichMenuArea(
-                bounds=RichMenuBounds(x=833, y=843, width=833, height=843),
+                bounds=RichMenuBounds(x=1250, y=421, width=1250, height=422),
                 action=URIAction(label='預約管理', uri='https://liff.line.me/2007532770-E9klDpwW')
             ),
+            # 下排左：價目表
             RichMenuArea(
-                bounds=RichMenuBounds(x=1666, y=843, width=834, height=843),
-                action=MessageAction(label='聯絡我們', text='聯絡我們')
-            )
+                bounds=RichMenuBounds(x=0, y=843, width=833, height=843),
+                action=MessageAction(label='價目表', text='價目表')
+            ),
+            # 下排中：作品集
+            RichMenuArea(
+                bounds=RichMenuBounds(x=833, y=843, width=834, height=843),
+                action=URIAction(label='作品集', uri='https://www.instagram.com/weii_nail')
+            ),
+            # 下排右：預約須知
+            RichMenuArea(
+                bounds=RichMenuBounds(x=1667, y=843, width=833, height=843),
+                action=MessageAction(label='預約須知', text='預約須知')
+            ),
         ]
     )
     
