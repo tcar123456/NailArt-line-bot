@@ -81,11 +81,3 @@ python app.py
 - 更新快捷選單時只需在本地執行 `create_rich_menu.py`
 
 ## 注意事項
-
-- 請勿將 `.env` 檔案提交到 Git
-- 快捷選單圖片必須符合 LINE 的規格要求
-- 本地測試時需要使用 ngrok 等工具建立 HTTPS 連線
-
-## 授權
-
-[授權說明] 

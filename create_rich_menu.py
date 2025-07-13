@@ -31,12 +31,12 @@ def create_rich_menu():
             # 右上（上半部）：立即預約
             RichMenuArea(
                 bounds=RichMenuBounds(x=1250, y=0, width=1250, height=421),
-                action=URIAction(label='立即預約', uri='https://liff.line.me/2007532770-0bqJlAgm')
+                action=URIAction(label='立即預約', uri='https://liff.line.me/2007660224-8ENjnxAV')
             ),
             # 右上（下半部）：預約查詢
             RichMenuArea(
                 bounds=RichMenuBounds(x=1250, y=421, width=1250, height=422),
-                action=URIAction(label='預約管理', uri='https://liff.line.me/2007532770-E9klDpwW')
+                action=URIAction(label='預約管理', uri='https://liff.line.me/2007660224-obaBJ3Qx')
             ),
             # 下排左：價目表
             RichMenuArea(
