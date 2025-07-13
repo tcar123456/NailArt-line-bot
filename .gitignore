@@ -1,8 +1,9 @@
-# Python
+# Python 快取檔案
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
+
+# 分發 / 打包
 .Python
 build/
 develop-eggs/
@@ -15,31 +16,31 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # 虛擬環境
 venv/
 env/
 ENV/
 
-# 環境變數
-.env
-.env.*
-
-# IDE
+# IDE 檔案
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# 系統檔案
+# 作業系統檔案
 .DS_Store
 Thumbs.db
 
-# 日誌檔案
-*.log
+# 環境變數檔案
+.env
+.env.local
+.env.production
 
-# 本地開發用檔案
-local_settings.py 
+# 日誌檔案
+*.log 

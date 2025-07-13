@@ -87,12 +87,12 @@ def handle_message(event):
                 event.reply_token,
                 [
                     ImageSendMessage(
-                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0002_rleygj.png",
-                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0002_rleygj.png"
+                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1752393324/WEII_nail_20250614_202005_0002_alqwtd.png",
+                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1752393324/WEII_nail_20250614_202005_0002_alqwtd.png"
                     ),
                     ImageSendMessage(
-                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0003_amx87y.png",
-                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1749912192/WEII_nail_20250614_202005_0003_amx87y.png"
+                        original_content_url="https://res.cloudinary.com/div4nzzda/image/upload/v1752393323/WEII_nail_20250614_202005_0003_gyi4vi.png",
+                        preview_image_url="https://res.cloudinary.com/div4nzzda/image/upload/v1752393323/WEII_nail_20250614_202005_0003_gyi4vi.png"
                     )
                 ]
             )

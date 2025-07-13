@@ -8,7 +8,6 @@
 - pip（Python 套件管理器）
 - Git
 - LINE Messaging API 帳號
-- Google Cloud Platform 帳號
 
 ## 專案結構
 
@@ -17,7 +16,6 @@
 ├── create_rich_menu.py    # 快捷選單設定工具（本地執行）
 ├── rich_menu_image.png    # 快捷選單圖片
 ├── requirements.txt       # Python 套件依賴
-├── Dockerfile            # Docker 設定檔
 └── .env                  # 環境變數設定（需自行建立）
 ```
 
@@ -63,42 +61,30 @@ pip install -r requirements.txt
 python create_rich_menu.py
 ```
 
-### 部署主要服務
+### 執行主要服務
 
-1. 提交程式碼到 GitHub：
 ```bash
-git add .
-git commit -m "更新程式碼"
-git push
+python app.py
 ```
-
-2. GitHub Actions 會自動部署到 Google Cloud Run
 
 ### LINE Developers 設定
 
 1. 在 LINE Developers Console 中：
-   - 設定 Webhook URL 為 Cloud Run 服務的 URL + "/callback"
+   - 設定 Webhook URL
    - 開啟 Use webhook
    - 關閉自動回覆訊息
 
 ## 開發說明
 
-- `app.py`：主要的 LINE Bot 服務，會部署到 Cloud Run
+- `app.py`：主要的 LINE Bot 服務
 - `create_rich_menu.py`：快捷選單設定工具，只在本地執行
 - 更新快捷選單時只需在本地執行 `create_rich_menu.py`
-- 更新主要服務時，提交到 GitHub 後會自動部署
 
 ## 注意事項
 
 - 請勿將 `.env` 檔案提交到 Git
 - 快捷選單圖片必須符合 LINE 的規格要求
 - 本地測試時需要使用 ngrok 等工具建立 HTTPS 連線
-
-## 環境變數設定
-
-在 Google Cloud Run 中需設定：
-- LINE_CHANNEL_ACCESS_TOKEN
-- LINE_CHANNEL_SECRET
 
 ## 授權
 
