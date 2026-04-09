@@ -27,6 +27,7 @@ secrets.json
 .vscode/
 .idea/
 *.sublime-*
+.claude/
 
 # ==================== 作業系統 ====================
 # Windows
