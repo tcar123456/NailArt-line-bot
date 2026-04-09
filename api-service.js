@@ -3,8 +3,8 @@
  * 請將 SCRIPT_URL 替換為您的 Google Apps Script 部署 URL
  */
 
-// ⚠️ 重要：請將此 URL 替換為您的 Google Apps Script 部署 URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWyHhUHGHnEkGtrKY5vOqSXmeubYdUCUtJgQOIpIDAuleppKjvQBg7isgjTwftKI6F/exec';
+// Cloudflare Worker URL（部署後替換為實際的 Worker URL）
+const SCRIPT_URL = 'https://nail-art-proxy.tcar123456.workers.dev';
 
 /**
  * API 服務類別
