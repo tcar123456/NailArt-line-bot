@@ -50,3 +50,6 @@ package-lock.json
 # 測試/開發用檔案
 test-*
 debug-*
+
+*.md
+*.MD
