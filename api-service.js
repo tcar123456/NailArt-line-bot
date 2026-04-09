@@ -142,94 +142,51 @@ class ApiService {
      */
     static async sendRequest(data) {
         try {
-            // 🛡️ 自動加入 CSRF Token（重要操作保護）
-            // 定義需要 CSRF 保護的操作
-            const csrfProtectedActions = [
-                'saveCustomer',         // 儲存客戶資料
-                'saveBooking',          // 儲存預約
-                'updateBookingStatus',  // 更新預約狀態
-                'deleteBooking'         // 刪除預約（如果有）
-            ];
-            
-            if (csrfProtectedActions.includes(data.action) && 
-                typeof CSRFProtection !== 'undefined') {
-                // 取得 CSRF Token 並加入請求
-                const csrfToken = CSRFProtection.getToken();
-                data.csrfToken = csrfToken;
-                
-                console.log('🛡️ 已加入 CSRF Token', {
-                    action: data.action,
-                    tokenLength: csrfToken.length
-                });
+            // 加入 LINE Access Token（所有請求統一驗證）
+            if (data.action !== 'ping' && typeof liff !== 'undefined' && liff.isLoggedIn()) {
+                data.accessToken = liff.getAccessToken();
             }
-            
+
             // 檢查是否在 LIFF 環境中
             const isLIFF = this.isLIFFEnvironment();
-            
+
             console.log('=== API 請求詳細資訊 ===');
             console.log('動作:', data.action);
-            // 🔒 安全日誌：遮罩敏感資訊
-            console.log('資料:', SecurityUtils.maskSensitiveData(data));
-            console.log('目標 URL:', SCRIPT_URL);
             console.log('環境:', isLIFF ? 'LIFF' : '一般瀏覽器');
-            console.log('時間:', new Date().toLocaleString());
-            console.log('User Agent:', navigator.userAgent);
             console.log('========================');
-            
-            // 優先使用 JSONP 方式（更可靠，特別是在 LIFF 環境中）
+
+            // 優先使用 POST 方式（ID Token 不能放 URL，不使用 JSONP）
             try {
-                console.log('🔄 嘗試使用 JSONP 方式...');
-                
-                // 準備 JSONP 參數
-                const jsonpParams = this.prepareJsonpParams(data);
-                
-                const result = await this.sendJsonpRequest(jsonpParams);
-                
-                console.log('=== JSONP 請求成功 ===');
-                // 🔒 安全日誌：遮罩敏感資訊
-                console.log('結果:', SecurityUtils.maskSensitiveData(result));
-                console.log('====================');
-                
-                return result;
-                
-            } catch (jsonpError) {
-                console.warn('JSONP 請求失敗，嘗試 POST 方式:', jsonpError.message);
-                
-                // JSONP 失敗，嘗試傳統 POST 方式
+                console.log('🔄 嘗試使用 POST 方式...');
+
                 // 🔧 CORS 修正：使用 text/plain 以避免觸發 Preflight OPTIONS
                 const fetchOptions = {
                     method: 'POST',
                     body: JSON.stringify(data)
-                    // 注意：不設定 Content-Type: application/json，避免跨域預檢失敗
                 };
-                
-                // 在 LIFF 環境中，某些情況下不設定 mode 可能更好
+
                 if (!isLIFF) {
                     fetchOptions.mode = 'cors';
                 }
 
-                console.log('請求選項:', fetchOptions);
-                console.log('請求內容:', JSON.stringify(data, null, 2));
-
                 const response = await fetch(SCRIPT_URL, fetchOptions);
-
-                console.log('=== POST 回應資訊 ===');
-                console.log('狀態碼:', response.status);
-                console.log('狀態文字:', response.statusText);
-                console.log('回應標頭:', Object.fromEntries(response.headers.entries()));
-                console.log('===================');
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('錯誤回應內容:', errorText);
                     throw new Error(`HTTP 錯誤! 狀態: ${response.status}, 內容: ${errorText}`);
                 }
 
                 const result = await response.json();
                 console.log('=== POST 請求成功 ===');
-                console.log('結果:', result);
-                console.log('===================');
-                
+                return result;
+
+            } catch (postError) {
+                console.warn('POST 請求失敗，嘗試 JSONP 方式:', postError.message);
+
+                // POST 失敗時回退 JSONP（注意：ping 等不需驗證的操作才能成功）
+                const jsonpParams = this.prepareJsonpParams(data);
+                const result = await this.sendJsonpRequest(jsonpParams);
+                console.log('=== JSONP 請求成功 ===');
                 return result;
             }
             

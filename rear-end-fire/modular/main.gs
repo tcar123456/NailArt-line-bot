@@ -8,6 +8,31 @@
 // ==================== HTTP 請求入口 ====================
 
 /**
+ * 驗證 LINE Access Token
+ * @param {string} accessToken - 前端傳來的 LINE Access Token
+ * @returns {string} - 驗證通過後的 LINE user ID
+ * @throws {Error} - 驗證失敗時拋出錯誤
+ */
+function verifyLineAccessToken(accessToken) {
+  if (!accessToken) {
+    throw new Error('缺少 LINE Access Token');
+  }
+
+  const response = UrlFetchApp.fetch('https://api.line.me/v2/profile', {
+    headers: { Authorization: 'Bearer ' + accessToken },
+    muteHttpExceptions: true
+  });
+
+  const result = JSON.parse(response.getContentText());
+
+  if (!result.userId) {
+    throw new Error('LINE Access Token 驗證失敗：' + (result.message || '未知錯誤'));
+  }
+
+  return result.userId; // 回傳經 LINE 驗證的真實 user ID
+}
+
+/**
  * 處理 GET 請求的主要函數
  * @param {Object} e - 請求事件物件
  * @returns {Object} - 回應結果
@@ -69,28 +94,30 @@ function handleRequest(e) {
       }
     }
 
-    console.log('收到請求:', action, data);
+    console.log('收到請求:', action);
 
-    // ==================== CSRF Token 驗證 ====================
+    // ==================== LINE ID Token 驗證 ====================
 
-    // 定義需要 CSRF Token 保護的操作
-    const csrfProtectedActions = ['saveCustomer', 'saveBooking', 'updateBookingStatus', 'deleteBooking'];
+    // ping 為健康檢查，不需驗證；其他所有操作都需要驗證
+    if (action !== 'ping') {
+      try {
+        const verifiedUserId = verifyLineAccessToken(data.accessToken);
+        console.log('ID Token 驗證通過 - ' + action);
 
-    if (csrfProtectedActions.includes(action)) {
-      // 檢查是否包含 CSRF Token
-      const csrfToken = data.csrfToken;
-
-      if (!csrfToken) {
-        console.warn('CSRF Token 缺失: ' + action);
+        // 若請求帶有 lineUserId，確認與 Token 一致，防止存取他人資料
+        if (data.lineUserId && data.lineUserId !== verifiedUserId) {
+          throw new Error('lineUserId 與 Access Token 不符');
+        }
+      } catch (authError) {
+        console.warn('ID Token 驗證失敗: ' + authError.message);
 
         const errorResult = JSON.stringify({
           success: false,
-          error: 'CSRF_TOKEN_MISSING',
-          message: '安全驗證失敗：缺少 CSRF Token',
+          error: 'AUTH_FAILED',
+          message: '身份驗證失敗：' + authError.message,
           timestamp: new Date().toISOString()
         });
 
-        // 返回 CSRF 錯誤
         if (callback) {
           return ContentService
             .createTextOutput(callback + "(" + errorResult + ")")
@@ -101,42 +128,6 @@ function handleRequest(e) {
             .setMimeType(ContentService.MimeType.JSON);
         }
       }
-
-      // 驗證 CSRF Token 格式（基本檢查）
-      // 注意：完整的 Token 驗證應該包括：
-      // 1. Token 格式檢查（包含隨機值和時間戳記）
-      // 2. Token 時效性檢查
-      // 3. Token 使用次數限制（防止重放攻擊）
-
-      // 基本格式驗證：檢查 Token 是否包含 "_" 分隔符
-      if (!csrfToken.includes('_') || csrfToken.length < 20) {
-        console.warn('CSRF Token 格式錯誤: ' + action, {
-          tokenLength: csrfToken.length
-        });
-
-        const errorResult = JSON.stringify({
-          success: false,
-          error: 'CSRF_TOKEN_INVALID',
-          message: '安全驗證失敗：CSRF Token 格式錯誤',
-          timestamp: new Date().toISOString()
-        });
-
-        // 返回 CSRF 錯誤
-        if (callback) {
-          return ContentService
-            .createTextOutput(callback + "(" + errorResult + ")")
-            .setMimeType(ContentService.MimeType.JAVASCRIPT);
-        } else {
-          return ContentService
-            .createTextOutput(errorResult)
-            .setMimeType(ContentService.MimeType.JSON);
-        }
-      }
-
-      // CSRF Token 驗證通過
-      console.log('CSRF Token 驗證通過 - ' + action, {
-        tokenLength: csrfToken.length
-      });
     }
 
     // ==================== 處理請求 ====================
