@@ -28,6 +28,7 @@ secrets.json
 .idea/
 *.sublime-*
 .claude/
+cloudflare-worker/.wrangler/
 
 # ==================== 作業系統 ====================
 # Windows
