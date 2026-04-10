@@ -132,7 +132,7 @@ async function loadSmartConfig() {
             }
             // 檢查是否包含敏感資訊
             if (backendConfig.apiKey && backendConfig.calendarId) {
-                finalConfig = backendConfig;
+                finalConfig = mergeConfigs(GOOGLE_CALENDAR_CONFIG.localConfig, backendConfig);
                 console.log('📡 使用後端配置（包含敏感資訊）');
             } else {
                 // 如果後端沒有敏感資訊，合併本地敏感資訊

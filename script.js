@@ -302,20 +302,23 @@ class NailBookingCalendar {
             // 但考量到後端可能需要 LIFF UserID 來記錄 Log，我們盡量並行
             
             const dataTask = (async () => {
-                 FLog.debug('啟動日曆資料載入任務...', null, 'calendar');
-                 // 這裡我們初始化 Google Calendar 服務並載入資料
-                 await this.initializeGoogleCalendar();
-                 await this.loadCurrentMonthDataWithLiff();
-                 // 資料載入完成！
-                 this.isDataLoaded = true;
-                 FLog.debug('日曆資料載入任務完成，準備重繪', null, 'calendar');
-                 
-                 // 4. 資料回來了！重新渲染日曆，這次會顯示可點選狀態
-                 this.renderCalendar();
-                 this.hideLoadingIndicator();
-                 
-                 // 預載下個月
-                 this.preloadNextMonthInLiffBackground();
+                 try {
+                     FLog.debug('啟動日曆資料載入任務...', null, 'calendar');
+                     // 這裡我們初始化 Google Calendar 服務並載入資料
+                     await this.initializeGoogleCalendar();
+                     await this.loadCurrentMonthDataWithLiff();
+                     // 資料載入完成！
+                     this.isDataLoaded = true;
+                     FLog.debug('日曆資料載入任務完成，準備重繪', null, 'calendar');
+
+                     // 4. 資料回來了！重新渲染日曆，這次會顯示可點選狀態
+                     this.renderCalendar();
+
+                     // 預載下個月（僅成功時執行）
+                     this.preloadNextMonthInLiffBackground();
+                 } finally {
+                     this.hideLoadingIndicator();
+                 }
             })();
             initPromises.push(dataTask);
 
