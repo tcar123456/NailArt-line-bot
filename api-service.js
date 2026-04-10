@@ -143,8 +143,15 @@ class ApiService {
     static async sendRequest(data) {
         try {
             // 加入 LINE Access Token（所有請求統一驗證）
-            if (data.action !== 'ping' && typeof liff !== 'undefined' && liff.isLoggedIn()) {
-                data.accessToken = liff.getAccessToken();
+            // 用 try-catch 包住 liff.isLoggedIn()：LIFF 未初始化時會拋出例外而非回傳 false
+            if (data.action !== 'ping') {
+                try {
+                    if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+                        data.accessToken = liff.getAccessToken();
+                    }
+                } catch (e) {
+                    // LIFF 尚未初始化，不附加 token，請求仍繼續發出
+                }
             }
 
             // 檢查是否在 LIFF 環境中

@@ -98,8 +98,9 @@ function handleRequest(e) {
 
     // ==================== LINE ID Token 驗證 ====================
 
-    // ping 為健康檢查，不需驗證；其他所有操作都需要驗證
-    if (action !== 'ping') {
+    // ping 為健康檢查；handleBatchCheckTimeSlotAvailability 為公開日曆資料，不含個人資訊，不需驗證
+    // 其他所有操作都需要驗證
+    if (action !== 'ping' && action !== 'handleBatchCheckTimeSlotAvailability') {
       try {
         const verifiedUserId = verifyLineAccessToken(data.accessToken);
         console.log('ID Token 驗證通過 - ' + action);

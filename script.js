@@ -298,13 +298,11 @@ class NailBookingCalendar {
             initPromises.push(liffTask);
 
             // 任務 B: 載入行事曆資料 (為了顯示忙碌狀態)
-            // 即使 LIFF 還沒好，我們也可以先嘗試載入資料 (如果後端允許的話)
-            // 但考量到後端可能需要 LIFF UserID 來記錄 Log，我們盡量並行
-            
+            // batchCheckTimeSlotAvailability 不需 Token 驗證，可立即發出，與 LIFF init 真正並行
+
             const dataTask = (async () => {
                  try {
                      FLog.debug('啟動日曆資料載入任務...', null, 'calendar');
-                     await this.ensureLiffReady();
                      await this.loadCurrentMonthDataWithLiff();
                      // 資料載入完成！
                      this.isDataLoaded = true;
@@ -1461,7 +1459,8 @@ class NailBookingCalendar {
             }
             return await window.liff.getProfile();
         } catch (error) {
-            console.error('取得 LIFF 用戶資訊失敗:', error);
+            // LIFF 尚未初始化時會拋出例外（正常情況，Task B 提前發出時會觸發）
+            console.debug('getLiffUserProfile: LIFF 未就緒，回傳 null');
             return null;
         }
     }
