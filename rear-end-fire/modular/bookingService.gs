@@ -17,7 +17,7 @@ function handleSaveBooking(booking) {
   Logger.api('開始處理預約儲存', { customerName: booking.customerName, date: booking.date, time: booking.time }, 'booking');
 
   // 使用 Document Lock 避免並發寫入
-  const bookingLock = LockService.getDocumentLock();
+  const bookingLock = LockService.getScriptLock();
   try {
     bookingLock.waitLock(30000);
   } catch (lockError) {
@@ -54,10 +54,29 @@ function handleSaveBooking(booking) {
       throw new Error(`無效的時間格式: ${booking.time}，請使用 HH:MM 格式`);
     }
 
-    // 後端二次驗證時段可用性
+    // 取得工作表（需在衝突檢查前備妥）
+    const bookingSheetName = getBookingSheetNameByDate(booking.date);
+    const bookingSheet = getSheet(bookingSheetName);
+    const customerSheet = getSheet(CUSTOMER_SHEET_NAME);
+
+    Logger.log('預約將寫入工作表: ' + bookingSheetName, { date: booking.date }, 'booking');
+
+    // 第一道防線：Sheets 強一致性衝突查詢（在鎖內執行，不受 Calendar API 傳播延遲影響）
+    const sheetsConflict = checkBookingConflictInSheets(bookingSheet, booking.date, booking.time);
+    if (sheetsConflict) {
+      Logger.warn('Sheets 衝突檢查：時段已被預約', { date: booking.date, time: booking.time }, 'booking');
+      return {
+        success: false,
+        error: 'TIME_SLOT_UNAVAILABLE',
+        message: '該時段已被預約，請重新選擇',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    // 第二道防線：Calendar 二次驗證（防止極低機率的傳播延遲邊界情況）
     const backendSlotCheck = verifyBackendTimeSlotAvailability(booking.date, booking.time);
     if (!backendSlotCheck.available) {
-      console.warn('後端時段檢查未通過:', backendSlotCheck);
+      Logger.warn('後端時段檢查未通過', backendSlotCheck, 'booking');
       return {
         success: false,
         error: backendSlotCheck.errorCode || 'TIME_SLOT_UNAVAILABLE',
@@ -66,13 +85,6 @@ function handleSaveBooking(booking) {
         timestamp: new Date().toISOString()
       };
     }
-
-    // 根據預約日期年份取得對應的工作表
-    const bookingSheetName = getBookingSheetNameByDate(booking.date);
-    const bookingSheet = getSheet(bookingSheetName);
-    const customerSheet = getSheet(CUSTOMER_SHEET_NAME);
-
-    Logger.log('預約將寫入工作表: ' + bookingSheetName, { date: booking.date }, 'booking');
 
     clearCustomerCache();
 
@@ -132,8 +144,6 @@ function handleSaveBooking(booking) {
 
     // 更新客戶預約資訊
     updateCustomerBookingInfo(booking.phone, now);
-
-    Utilities.sleep(500);
 
     // 建立 Google 日曆活動
     let calendarEventResult = null;
@@ -232,6 +242,66 @@ function handleSaveBooking(booking) {
   } finally {
     bookingLock.releaseLock();
     console.log('已釋放預約鎖定');
+  }
+}
+
+// ==================== Sheets 衝突查詢 ====================
+
+/**
+ * 將 YYYY-MM-DD 格式轉換為 Sheets 中儲存的中文日期格式
+ * 例：'2025-07-01' → '2025年7月1日'（月日不補零）
+ * @param {string} dateStr - YYYY-MM-DD 格式
+ * @returns {string} - "YYYY年M月D日" 格式
+ */
+function formatDateForSheet(dateStr) {
+  var parts = dateStr.split('-');
+  var year = parseInt(parts[0], 10);
+  var month = parseInt(parts[1], 10);
+  var day = parseInt(parts[2], 10);
+  return year + '年' + month + '月' + day + '日';
+}
+
+/**
+ * 在日期與時間資料陣列中尋找衝突（純函式，方便單元測試）
+ * @param {Array} dateValues - 日期欄位二維陣列 [[date1], [date2], ...]
+ * @param {Array} timeValues - 時間欄位二維陣列 [[time1], [time2], ...]
+ * @param {string} storedDate - 已轉換為 Sheets 格式的日期字串
+ * @param {string} timeStr - 時間字串 HH:MM
+ * @returns {boolean} - true 表示有衝突
+ */
+function hasConflictInBookingData(dateValues, timeValues, storedDate, timeStr) {
+  for (var i = 0; i < dateValues.length; i++) {
+    var rowDate = String(dateValues[i][0]);
+    var rowTime = String(timeValues[i][0]).trim();
+    if (rowDate === storedDate && rowTime === timeStr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * 在鎖內查詢 Sheets，確認指定日期時間是否已有預約（強一致性）
+ * Sheets 的 getValues() 反映 flush() 後的最新狀態，不受 Calendar API 傳播延遲影響
+ * @param {Sheet} bookingSheet - 預約工作表
+ * @param {string} dateStr - YYYY-MM-DD 格式
+ * @param {string} timeStr - HH:MM 格式
+ * @returns {boolean} - true 表示有衝突
+ */
+function checkBookingConflictInSheets(bookingSheet, dateStr, timeStr) {
+  try {
+    var lastRow = bookingSheet.getLastRow();
+    if (lastRow < 2) return false; // 只有標頭或空表
+
+    // 只讀取日期欄（第4欄）與時間欄（第5欄），避免讀取整列造成效能浪費
+    var dateValues = bookingSheet.getRange(2, 4, lastRow - 1, 1).getValues();
+    var timeValues = bookingSheet.getRange(2, 5, lastRow - 1, 1).getValues();
+    var storedDate = formatDateForSheet(dateStr);
+
+    return hasConflictInBookingData(dateValues, timeValues, storedDate, timeStr);
+  } catch (error) {
+    Logger.warn('Sheets 衝突檢查失敗，略過（讓 Calendar 檢查繼續）', error, 'booking');
+    return false;
   }
 }
 
