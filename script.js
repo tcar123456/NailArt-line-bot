@@ -530,7 +530,6 @@ class NailBookingCalendar {
                 window.addEventListener('googleCalendarConfigLoaded', (event) => {
                     console.log('🔔 收到 Google Calendar 配置載入完成通知');
                     clearTimeout(timeout);
-                    this.checkBackendApiService();
                     resolve(true);
                 });
                 
