@@ -807,78 +807,27 @@ function initConfirmButton() {
     // 確認服務按鈕點擊事件
     confirmServiceBtn.addEventListener('click', async function() {
         try {
-            // 立即關閉確認模態框，顯示載入模態框
             confirmModal.classList.add('hidden');
             const loadingModal = document.getElementById('loadingModal');
-            loadingModal.classList.remove('hidden');
-            
-            // 準備預約資料
-            const bookingData = await prepareBookingData();
-            
-            // 🚨 關鍵防護：在正式預約前再次檢查時段是否已被占用
-            // 這是為了防止在下個月開放時（約15人同時預約）發生重複預約的情況
-            console.log('🔍 執行最終時段檢查，防止重複預約...');
-            console.log('📅 檢查日期:', bookingData.date);
-            console.log('⏰ 檢查時間:', bookingData.time);
-            
-            // 更新載入提示訊息
             const loadingModalContent = loadingModal.querySelector('h3');
-            if (loadingModalContent) {
-                loadingModalContent.textContent = '正在檢查時段可用性...';
-            }
-            
-            // 檢查指定日曆的時段是否已被占用
-            const timeSlotAvailability = await checkTimeSlotBeforeBooking(bookingData.date, bookingData.time);
-            
-            if (!timeSlotAvailability.available) {
-                // 時段已被占用，停止預約流程
-                loadingModal.classList.add('hidden');
-                
-                console.log('❌ 時段已被占用，取消預約');
-                alert('很抱歉，這個時段剛好被其他客戶預約了，請重新選擇其他時段。');
-                
-                // 跳轉回首頁重新選擇時段
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // 時段仍然可用，繼續預約流程
-            console.log('✅ 時段檢查通過，繼續預約流程');
-            
-            // 更新載入提示訊息
-            if (loadingModalContent) {
-                loadingModalContent.textContent = '正在為您預約...';
-            }
-            
-            // 發送預約請求到後端
-            const result = await ApiService.saveBooking(bookingData);
-            
-            // 關閉載入模態框
-            loadingModal.classList.add('hidden');
-            
-            if (result.success) {
-                // 成功時，保存服務記錄到本地並顯示成功模態框
-                saveServiceData();
-                successModal.classList.remove('hidden');
-            } else {
-                // 失敗時顯示錯誤訊息
-                alert(result.message || '預約失敗，請重試');
-            }
-            
+            loadingModal.classList.remove('hidden');
+            if (loadingModalContent) loadingModalContent.textContent = '正在為您預約...';
+
+            const bookingData = await prepareBookingData();
+
+            // 防止重複預約由後端 ScriptLock + Sheets 衝突查詢負責
+            // 後端回傳 TIME_SLOT_UNAVAILABLE / TIME_SLOT_CONFLICT 時由 submitBooking 處理
+            await submitBooking(bookingData, loadingModal, {
+                onSuccess: function() {
+                    saveServiceData();
+                    successModal.classList.remove('hidden');
+                }
+            });
+
         } catch (error) {
-            // 關閉載入模態框
-            const loadingModal = document.getElementById('loadingModal');
-            loadingModal.classList.add('hidden');
-            
+            document.getElementById('loadingModal').classList.add('hidden');
             console.error('💥 預約失敗:', error);
-            
-            // 提供更詳細的錯誤訊息
-            let errorMessage = '預約過程中發生錯誤，請重試';
-            if (error.message) {
-                errorMessage = error.message;
-            }
-            
-            alert(errorMessage);
+            alert(error.message || '預約過程中發生錯誤，請重試');
         }
     });
     
