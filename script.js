@@ -304,8 +304,6 @@ class NailBookingCalendar {
             const dataTask = (async () => {
                  try {
                      FLog.debug('啟動日曆資料載入任務...', null, 'calendar');
-                     // 這裡我們初始化 Google Calendar 服務並載入資料
-                     await this.initializeGoogleCalendar();
                      await this.ensureLiffReady();
                      await this.loadCurrentMonthDataWithLiff();
                      // 資料載入完成！
@@ -494,111 +492,6 @@ class NailBookingCalendar {
     }
     
     
-    /**
-     * 🔄 並行初始化版本：Google日曆服務初始化
-     * 返回 Promise 以支援並行執行，並加強錯誤處理
-     */
-    async initializeGoogleCalendar() {
-        return new Promise((resolve, reject) => {
-            try {
-                console.log('📅 開始初始化 Google Calendar 服務...');
-                
-                // 設定超時機制
-                const timeout = setTimeout(() => {
-                    console.warn('⚠️ Google Calendar 服務初始化超時，但不阻斷主流程');
-                    resolve(false); // 超時也算成功，避免阻斷主流程
-                }, 5000); // 5秒超時
-                
-                // 監聽配置載入完成事件（保留向後相容）
-                window.addEventListener('googleCalendarConfigLoaded', (event) => {
-                    console.log('🔔 收到 Google Calendar 配置載入完成通知');
-                    clearTimeout(timeout);
-                    resolve(true);
-                });
-                
-            } catch (error) {
-                console.error('❌ Google Calendar 服務初始化異常:', error);
-                resolve(false); // 即使異常也不阻斷主流程
-            }
-        });
-    }
-
-    /**
-     * 🔄 異步版本：檢查後端 API 服務狀態
-     * 返回 Promise 以支援並行處理
-     */
-    async checkBackendApiServiceAsync() {
-        try {
-            if (window.ApiService) {
-                console.log('✅ 後端 API 服務已載入');
-                
-                // 測試後端連接
-                await this.testBackendConnection();
-                
-                // 如果有最終配置，顯示配置來源
-                if (window.GOOGLE_CALENDAR_FINAL_CONFIG) {
-                    console.log(`🔗 配置來源: ${window.GOOGLE_CALENDAR_FINAL_CONFIG.configSource || '後端'}`);
-                }
-                
-                return true;
-            } else {
-                console.warn('⚠️ 後端 API 服務未載入，稍後重試');
-                
-                // 等待一段時間後重試
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                if (window.ApiService) {
-                    console.log('✅ 後端 API 服務重試成功');
-                    return true;
-                }
-                
-                return false;
-            }
-        } catch (error) {
-            console.error('❌ 檢查後端 API 服務狀態失敗:', error);
-            return false;
-        }
-    }
-    
-    /**
-     * 檢查後端 API 服務狀態
-     */
-    checkBackendApiService() {
-        try {
-            if (window.ApiService) {
-                console.log('✅ 後端 API 服務已載入');
-                
-                // 測試後端連接
-                this.testBackendConnection();
-                
-                // 如果有最終配置，顯示配置來源
-                if (window.GOOGLE_CALENDAR_FINAL_CONFIG) {
-                    console.log(`🔗 配置來源: ${window.GOOGLE_CALENDAR_FINAL_CONFIG.configSource || '後端'}`);
-                }
-            } else {
-                console.warn('⚠️ 後端 API 服務未載入');
-            }
-        } catch (error) {
-            console.error('❌ 檢查後端 API 服務狀態失敗:', error);
-        }
-    }
-    
-    /**
-     * 測試後端連接
-     */
-    async testBackendConnection() {
-        try {
-            const result = await window.ApiService.sendRequest({ action: 'ping' });
-            if (result.success) {
-                console.log('✅ 後端連接測試成功');
-            } else {
-                console.warn('⚠️ 後端連接測試失敗:', result.error);
-            }
-        } catch (error) {
-            console.warn('⚠️ 後端連接測試異常:', error.message);
-        }
-    }
-
     /**
      * 🔄 載入日曆資料（修改版 - 使用 LIFF 環境優化）
      * 保留原有邏輯，但使用新的 LIFF 環境載入方法
