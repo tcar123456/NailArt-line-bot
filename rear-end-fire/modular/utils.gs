@@ -87,40 +87,6 @@ function createOptimizedResponse(data, includeDebugInfo = false) {
   return response;
 }
 
-/**
- * 建立成功回應
- * @param {Object} data - 回應資料
- * @returns {TextOutput} - 格式化的回應
- */
-function createSuccessResponse(data) {
-  const response = {
-    success: true,
-    timestamp: new Date().toISOString(),
-    ...data
-  };
-
-  return ContentService
-    .createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * 建立錯誤回應
- * @param {string} message - 錯誤訊息
- * @returns {TextOutput} - 格式化的錯誤回應
- */
-function createErrorResponse(message) {
-  const response = {
-    success: false,
-    error: message,
-    timestamp: new Date().toISOString()
-  };
-
-  return ContentService
-    .createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
 // ==================== ID 生成 ====================
 
 /**

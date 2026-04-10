@@ -293,19 +293,3 @@ function verifyBackendTimeSlotAvailability(dateStr, timeStr) {
     return defaultResponse;
   }
 }
-
-// ==================== 預約狀態更新 ====================
-
-/**
- * 處理預約狀態更新（已停用）
- * @param {string} bookingId - 預約ID
- * @param {string} status - 新狀態
- * @returns {Object} - 處理結果
- */
-function handleUpdateBookingStatus(bookingId, status) {
-  return {
-    success: false,
-    error: '預約狀態更新功能已移除',
-    timestamp: new Date().toISOString()
-  };
-}

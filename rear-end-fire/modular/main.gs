@@ -158,10 +158,6 @@ function handleRequest(e) {
         result = handleGetCustomer(data.phone);
         break;
 
-      case 'updateBookingStatus':
-        result = handleUpdateBookingStatus(data.bookingId, data.status);
-        break;
-
       case 'verifyCustomerByLineId':
         result = handleVerifyCustomerByLineId(data.lineUserId);
         break;

@@ -15,10 +15,6 @@ let CONFIG_CACHE_TIMESTAMP = null;
 let SPREADSHEET_CACHE = null;
 let SPREADSHEET_CACHE_TIME = null;
 
-// 客戶資料快取
-let customerDataCache = null;
-let cacheTimestamp = null;
-
 // 客戶索引快取
 let customerIndexMap = null;
 let indexCacheTime = null;
@@ -227,35 +223,11 @@ function clearSpreadsheetCache() {
   SPREADSHEET_CACHE_TIME = null;
 }
 
-// ==================== 客戶資料快取 ====================
-
-/**
- * 取得客戶資料（含快取機制）
- * @returns {Array} - 客戶資料陣列
- */
-function getCachedCustomerData() {
-  const now = new Date().getTime();
-
-  if (customerDataCache && cacheTimestamp && (now - cacheTimestamp < SYSTEM_CONFIG.CACHE_DURATION)) {
-    console.log('使用快取的客戶資料');
-    return customerDataCache;
-  }
-
-  console.log('重新讀取客戶資料');
-  const sheet = getSheet(CUSTOMER_SHEET_NAME);
-  customerDataCache = sheet.getDataRange().getValues();
-  cacheTimestamp = now;
-
-  return customerDataCache;
-}
-
 /**
  * 清除客戶資料快取
  */
 function clearCustomerCache() {
   console.log('清理客戶快取（觸發索引重建）');
-  customerDataCache = null;
-  cacheTimestamp = null;
   customerIndexMap = null;
   indexCacheTime = null;
 }
