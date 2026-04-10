@@ -306,6 +306,7 @@ class NailBookingCalendar {
                      FLog.debug('啟動日曆資料載入任務...', null, 'calendar');
                      // 這裡我們初始化 Google Calendar 服務並載入資料
                      await this.initializeGoogleCalendar();
+                     await this.ensureLiffReady();
                      await this.loadCurrentMonthDataWithLiff();
                      // 資料載入完成！
                      this.isDataLoaded = true;
@@ -507,24 +508,6 @@ class NailBookingCalendar {
                     console.warn('⚠️ Google Calendar 服務初始化超時，但不阻斷主流程');
                     resolve(false); // 超時也算成功，避免阻斷主流程
                 }, 5000); // 5秒超時
-                
-                // 檢查後端 API 服務狀態
-                const checkResult = this.checkBackendApiServiceAsync();
-                
-                checkResult.then(success => {
-                    clearTimeout(timeout);
-                    if (success) {
-                        console.log('✅ Google Calendar 服務初始化成功');
-                        resolve(true);
-                    } else {
-                        console.warn('⚠️ Google Calendar 服務初始化部分失敗');
-                        resolve(false); // 即使失敗也不阻斷主流程
-                    }
-                }).catch(error => {
-                    clearTimeout(timeout);
-                    console.warn('⚠️ Google Calendar 服務初始化失敗:', error.message);
-                    resolve(false); // 轉為成功以避免阻斷主流程
-                });
                 
                 // 監聽配置載入完成事件（保留向後相容）
                 window.addEventListener('googleCalendarConfigLoaded', (event) => {
