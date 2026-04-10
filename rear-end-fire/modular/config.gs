@@ -47,8 +47,10 @@ const ADVANCED_CALENDAR_CONFIG = {
   },
 
   // 智慧分頁配置
+  // ⚠️ 停用智慧分頁：30天查詢時pageSize被壓到150，反而比直接查詢（maxResults:2500）慢3-5倍
+  // getEventsDirectly() 用 maxResults:2500 一次取完，對美甲預約量(<=300筆/月)完全夠用
   smartPagination: {
-    enabled: true,
+    enabled: false,
     pageSize: {
       base: 100,
       min: 50,
