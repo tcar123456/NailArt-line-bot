@@ -103,5 +103,7 @@ def handle_message(event):
 
 # 程式進入點，當直接執行此檔案時會啟動 Flask 伺服器
 if __name__ == "__main__":
-    # 啟動 Flask 應用程式，debug=True 表示開發模式（會自動重載程式碼）
-    app.run(debug=True) 
+    # 透過環境變數 FLASK_DEBUG 控制是否開啟 debug 模式
+    # 正式環境務必為 False（或不設定），避免 Werkzeug debugger 造成 RCE 風險
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    app.run(debug=debug_mode)
