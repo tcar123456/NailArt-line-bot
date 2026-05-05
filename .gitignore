@@ -33,6 +33,9 @@ ENV/
 *.swp
 *.swo
 
+# Claude Code 設定
+.claude/
+
 # 作業系統檔案
 .DS_Store
 Thumbs.db
