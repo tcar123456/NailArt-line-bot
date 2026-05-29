@@ -8,6 +8,7 @@
 // ==================== 工作表名稱常數 ====================
 const CUSTOMER_SHEET_NAME = '客戶資料';
 const BOOKING_SHEET_NAME = '預約記錄';
+const BOOKING_AUDIT_SHEET_NAME = '預約操作紀錄';
 
 // ==================== 系統設定常數 ====================
 const SYSTEM_CONFIG = {

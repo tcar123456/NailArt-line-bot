@@ -103,6 +103,7 @@ function generateId() {
  * 預約紀錄工作表的標題欄位
  */
 const BOOKING_SHEET_HEADERS = ['LINE User ID', '客戶姓名', '手機', '預約日期', '預約時間', '服務項目', '卸甲服務', '延甲', '備註', '建立時間', 'Event ID'];
+const BOOKING_AUDIT_SHEET_HEADERS = ['時間戳記', '操作', '操作者LINE_ID', '預約對象LINE_ID', '客戶姓名', '手機', '預約日期', '預約時間', 'Event ID', '結果'];
 
 /**
  * 取得指定的工作表
@@ -123,6 +124,9 @@ function getSheet(sheetName) {
     } else if (sheetName === BOOKING_SHEET_NAME || isBookingSheetName(sheetName)) {
       // 支援主預約工作表和年度預約工作表
       sheet.getRange(1, 1, 1, BOOKING_SHEET_HEADERS.length).setValues([BOOKING_SHEET_HEADERS]);
+    } else if (sheetName === BOOKING_AUDIT_SHEET_NAME) {
+      // 預約操作稽核表
+      sheet.getRange(1, 1, 1, BOOKING_AUDIT_SHEET_HEADERS.length).setValues([BOOKING_AUDIT_SHEET_HEADERS]);
     }
 
     sheet.getRange(1, 1, 1, sheet.getLastColumn()).setFontWeight('bold');

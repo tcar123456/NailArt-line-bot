@@ -245,6 +245,56 @@ function handleSaveBooking(booking) {
   }
 }
 
+/**
+ * 寫入預約操作稽核紀錄（永久保存於獨立工作表）
+ *
+ * 目的：執行記錄保留期短，過期後無法查證某筆預約是哪個 LINE 帳號、何時送出。
+ * 此函式把「實際操作者的真實 lineUserId（經 Access Token 驗證）+ 時間 + 結果」
+ * 永久寫進稽核表，供日後「我沒約過」爭議查證。
+ *
+ * 注意：稽核寫入失敗絕不可影響預約主流程，整個函式以 try/catch 吞掉錯誤。
+ *
+ * @param {string} operatorUserId - 經驗證的真實操作者 LINE User ID（可能為空）
+ * @param {Object} booking - 前端送出的預約資料
+ * @param {Object} result - handleSaveBooking 的回傳結果
+ */
+function logBookingAudit(operatorUserId, booking, result) {
+  try {
+    booking = booking || {};
+    result = result || {};
+
+    const eventId = (result.calendarEvent && result.calendarEvent.eventId) || '';
+    const outcome = result.success
+      ? '成功'
+      : '失敗:' + (result.error || result.message || '未知錯誤');
+
+    const auditSheet = getSheet(BOOKING_AUDIT_SHEET_NAME);
+    const newRow = auditSheet.getLastRow() + 1;
+
+    auditSheet.appendRow([
+      new Date(),
+      'saveBooking',
+      operatorUserId || '',
+      booking.lineUserId || '',
+      booking.customerName || '',
+      booking.phone || '',       // 手機欄改為文字格式後再覆寫，避免被當數字
+      booking.date || '',
+      booking.time || '',
+      eventId,
+      outcome
+    ]);
+
+    // 手機欄（第 6 欄）設為文字格式，比照預約記錄表寫法
+    if (booking.phone) {
+      const phoneCell = auditSheet.getRange(newRow, 6);
+      phoneCell.setNumberFormat('@');
+      phoneCell.setValue(booking.phone);
+    }
+  } catch (auditError) {
+    console.error('寫入預約操作稽核紀錄失敗（不影響預約）:', auditError);
+  }
+}
+
 // ==================== Sheets 衝突查詢 ====================
 
 /**

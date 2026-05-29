@@ -100,9 +100,10 @@ function handleRequest(e) {
 
     // ping 為健康檢查；handleBatchCheckTimeSlotAvailability 為公開日曆資料，不含個人資訊，不需驗證
     // 其他所有操作都需要驗證
+    let verifiedUserId = null; // 經 Access Token 驗證的真實操作者 ID，供稽核使用
     if (action !== 'ping' && action !== 'handleBatchCheckTimeSlotAvailability') {
       try {
-        const verifiedUserId = verifyLineAccessToken(data.accessToken);
+        verifiedUserId = verifyLineAccessToken(data.accessToken);
         console.log('ID Token 驗證通過 - ' + action);
 
         // 若請求帶有 lineUserId，確認與 Token 一致，防止存取他人資料
@@ -151,9 +152,18 @@ function handleRequest(e) {
         result = handleSaveCustomer(data.customer || data);
         break;
 
-      case 'saveBooking':
-        result = handleSaveBooking(data.booking || data);
+      case 'saveBooking': {
+        const bookingInput = data.booking || data;
+        try {
+          result = handleSaveBooking(bookingInput);
+          logBookingAudit(verifiedUserId, bookingInput, result); // 單點稽核：含成功與一般失敗
+        } catch (bookingError) {
+          // 嚴重錯誤（throw）路徑也留痕，再往外拋維持原本錯誤回應
+          logBookingAudit(verifiedUserId, bookingInput, { success: false, error: bookingError.message });
+          throw bookingError;
+        }
         break;
+      }
 
       case 'getCustomer':
         result = handleGetCustomer(data.phone);
