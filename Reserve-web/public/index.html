@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <!-- 設定文件編碼為 UTF-8 -->
+    <meta charset="UTF-8">
+    <!-- 設定響應式設計的視窗參數，適合手機瀏覽 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 網頁標題 -->
+    <title>美甲預約系統</title>
+    
+    <!-- 效能優化：預載入關鍵 CSS 資源 -->
+    <!-- 只預載入 CSS 檔案，因為它們會立即用於頁面渲染 -->
+    <!-- JavaScript 檔案已使用 defer 屬性，會在 HTML 解析時並行下載，無需額外 preload -->
+    <link rel="preload" href="style.css" as="style">
+    
+    <!-- 效能優化：DNS 預解析 -->
+    <link rel="dns-prefetch" href="//static.line-scdn.net">
+    <link rel="dns-prefetch" href="//script.google.com">
+    <link rel="dns-prefetch" href="//www.googleapis.com">
+    
+    <!-- 效能優化：預連接重要域名 -->
+    <link rel="preconnect" href="https://static.line-scdn.net" crossorigin>
+    <link rel="preconnect" href="https://www.googleapis.com" crossorigin>
+    
+    <!-- 引入外部 CSS 樣式檔案 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 主要容器，包含所有內容 -->
+    <div class="container">
+        <!-- 載入指示器 -->
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>正在載入預約系統...</p>
+        </div>
+        
+        <!-- 行事曆容器 -->
+        <div class="calendar-container">
+            <!-- 行事曆標題列，包含月份導航按鈕 -->
+            <div class="calendar-header">
+                <!-- 上一個月按鈕 -->
+                <button id="prevMonth" class="nav-btn">‹</button>
+                <!-- 顯示當前年月 -->
+                <h2 id="currentMonth"></h2>
+                <!-- 下一個月按鈕 -->
+                <button id="nextMonth" class="nav-btn">›</button>
+            </div>
+            <!-- 行事曆網格容器 -->
+            <div class="calendar-grid">
+                <!-- 星期標題列 -->
+                <div class="weekdays">
+                    <div>日</div>
+                    <div>一</div>
+                    <div>二</div>
+                    <div>三</div>
+                    <div>四</div>
+                    <div>五</div>
+                    <div>六</div>
+                </div>
+                <!-- 日期格子容器，由 JavaScript 動態生成內容 -->
+                <div id="calendarDays" class="days"></div>
+            </div>
+        </div>
+
+        <!-- 時段選擇區域，預設隱藏，選擇日期後顯示 -->
+        <div id="timeSlots" class="time-slots hidden">
+            <!-- 顯示選中的日期 -->
+            <h3 id="selectedDate"></h3>
+            <!-- 時段按鈕容器，內容將由JavaScript動態生成 -->
+            <div class="slots-container">
+                <!-- 動態時段將在這裡生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用 defer 屬性非阻塞載入 JavaScript -->
+    <!-- 引入LIFF SDK -->
+    <script defer charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- 🔒 引入安全工具模組（必須優先載入，供其他模組使用） -->
+    <script defer src="security-utils.js"></script>
+    <!-- 🔐 引入加密工具模組（localStorage 資料加密） -->
+    <script defer src="crypto-utils.js"></script>
+    <!-- 🛡️ 引入 CSRF 保護模組（防止跨站請求偽造） -->
+    <script defer src="csrf-protection.js"></script>
+    <!-- 引入 LIFF 服務模組 -->
+    <script defer src="liff-service.js"></script>
+    <!-- 引入 API 服務模組 -->
+    <script defer src="api-service.js"></script>
+    <!-- 引入主要功能 JavaScript -->
+    <script defer src="script.js"></script>
+</body>
+</html> 
