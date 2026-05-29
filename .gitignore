@@ -1,49 +1,9 @@
-# Python 快取檔案
-__pycache__/
-*.py[cod]
-*$py.class
+# ==================== monorepo 根層忽略 ====================
+# 僅錨定根目錄的散落檔，不影響子專案內同類檔
+# （NailArt-line-bot/、Reserve-web/ 各自有自己的 .gitignore）
 
-# 分發 / 打包
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# 虛擬環境
-venv/
-env/
-ENV/
-
-# IDE 檔案
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Claude Code 設定
-.claude/
-
-# 作業系統檔案
-.DS_Store
-Thumbs.db
-
-# 環境變數檔案
-.env
-.env.local
-.env.production
-
-# 日誌檔案
-*.log 
+# 父目錄散落的圖片 / 筆記 / 截圖 / GAS 備份
+/*.png
+/*.txt
+/截圖/
+/備份*.js
